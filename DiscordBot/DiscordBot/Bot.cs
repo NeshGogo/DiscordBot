@@ -10,6 +10,10 @@ internal class Bot
     private readonly DiscordSocketClient _client;
     private readonly string _token;
     private readonly IChatClient _aiChatClient;
+    const string systemBehavior = "You are a helpful and concise AI assistant.  Prioritize brevity and clarity in your responses.  Aim for short, direct" +
+        " answers, avoiding unnecessary details or explanations unless specifically requested.  Your primary goal is to provide information quickly and " +
+        "efficiently, minimizing response time for the user.  Do not exceed the requested length or word count.  If a question is ambiguous, " +
+        "ask clarifying questions before providing a response.";
 
     public Bot(IChatClient aiChatClient, DiscordOptions options)
     {
@@ -37,8 +41,11 @@ internal class Bot
     private async Task MessageReceivedAsync(SocketMessage message)
     {
         if (message.Author.IsBot) return;
-
-        var response = await _aiChatClient.GetResponseAsync(message.Content);
+        var prompt = $@"
+            Behavior: {systemBehavior}
+            Message: {message.Content}            
+        ";
+        var response = await _aiChatClient.GetResponseAsync(prompt);
 
         await ReplayAsync(message, response.Message.Text);
     }
