@@ -21,6 +21,7 @@ internal class Bot
         _token = options.Token;
         _client = new DiscordSocketClient();
         _client.MessageReceived += MessageReceivedAsync;
+        _client.Log += LogAsync;
     }
 
     public async Task StartAsync()
@@ -52,5 +53,8 @@ internal class Bot
 
     private async Task ReplayAsync(SocketMessage message, string response) =>
         await message.Channel.SendMessageAsync(response);
+
+    private async Task LogAsync(LogMessage log) =>
+        Console.WriteLine(log.Message);
 
 }
