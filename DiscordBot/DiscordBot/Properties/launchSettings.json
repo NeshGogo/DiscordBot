@@ -4,10 +4,7 @@
       "commandName": "Project"
     },
     "Container (Dockerfile)": {
-      "commandName": "Docker",
-      "environmentVariables": {
-        "DISCORD_BOT_TOKEN": "your token here"
-      }
+      "commandName": "Docker"
     }
   }
 }

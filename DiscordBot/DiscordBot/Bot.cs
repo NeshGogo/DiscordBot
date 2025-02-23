@@ -1,15 +1,20 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using DiscordBot.Options;
+using Microsoft.Extensions.AI;
 
 namespace DiscordBot;
 
 internal class Bot
 {
     private readonly DiscordSocketClient _client;
-    private readonly string _token = Environment.GetEnvironmentVariable("DISCORD_BOT_TOKEN") ?? string.Empty;
+    private readonly string _token;
+    private readonly IChatClient _aiChatClient;
 
-    public Bot()
+    public Bot(IChatClient aiChatClient, DiscordOptions options)
     {
+        _aiChatClient = aiChatClient;
+        _token = options.Token;
         _client = new DiscordSocketClient();
         _client.MessageReceived += MessageReceivedAsync;
     }
@@ -33,7 +38,9 @@ internal class Bot
     {
         if (message.Author.IsBot) return;
 
-        await ReplayAsync(message, "Test response from the code");
+        var response = await _aiChatClient.GetResponseAsync(message.Content);
+
+        await ReplayAsync(message, response.Message.Text);
     }
 
     private async Task ReplayAsync(SocketMessage message, string response) =>
