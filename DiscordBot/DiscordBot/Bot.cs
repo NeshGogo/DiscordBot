@@ -14,6 +14,7 @@ internal class Bot
         " answers, avoiding unnecessary details or explanations unless specifically requested.  Your primary goal is to provide information quickly and " +
         "efficiently, minimizing response time for the user.  Do not exceed the requested length or word count.  If a question is ambiguous, " +
         "ask clarifying questions before providing a response.";
+    List<ChatMessage> history = [];
 
     public Bot(IChatClient aiChatClient, DiscordOptions options)
     {
@@ -46,7 +47,12 @@ internal class Bot
             Behavior: {systemBehavior}
             Message: {message.Content}            
         ";
-        var response = await _aiChatClient.GetResponseAsync(prompt);
+
+        history.Add(new ChatMessage(ChatRole.User, prompt));
+
+        var response = await _aiChatClient.GetResponseAsync(history);
+
+        history.Add(new ChatMessage(ChatRole.Assistant, response.Message.Text));
 
         await ReplayAsync(message, response.Message.Text);
     }
